@@ -4,6 +4,7 @@ import { LEVELS, GRID_SIZE, FALLBACK_QUESTIONS } from "./constants";
 import { useMatch3 } from "./hooks/useMatch3";
 import { Tile } from "./components/Tile";
 import { QuizModal } from "./components/QuizModal";
+import { MissionPanel } from "./components/MissionPanel";
 import { generateQuizQuestions } from "./services/geminiService";
 import { Play, RefreshCw, Zap, Cpu, Trophy } from "lucide-react";
 
@@ -16,20 +17,39 @@ const App: React.FC = () => {
 
   const currentLevelConfig = LEVELS[currentLevelIdx];
 
+  // --- YANGI FUNKSIYA: Tasodifiy savol tanlash ---
+  const getRandomFallbackQuestions = (count: number): QuizQuestion[] => {
+    // Ro'yxatni aralashtiramiz (Shuffle)
+    const shuffled = [...FALLBACK_QUESTIONS].sort(() => 0.5 - Math.random());
+    // Kerakli miqdorni kesib olamiz
+    return shuffled.slice(0, count);
+  };
+
   const prepareQuiz = async () => {
     if (isQuizLoading) return;
     setIsQuizLoading(true);
+    
     try {
+      // 1. Avval API dan olishga urinib ko'ramiz
       const questions = await generateQuizQuestions(
         currentLevelConfig.quizDifficulty,
         currentLevelConfig.activeTokens
       );
-      setQuizQuestions(
-        questions && questions.length > 0 ? questions : FALLBACK_QUESTIONS
-      );
+
+      // 2. Agar API dan savol kelsa, o'shani qo'yamiz
+      if (questions && questions.length >= 5) {
+        setQuizQuestions(questions);
+      } else {
+        // 3. Agar API ishlamasa, o'zimizdagi ro'yxatdan 5 tasini olamiz
+        console.warn("API failed, using fallback questions");
+        setQuizQuestions(getRandomFallbackQuestions(5));
+      }
+      
       setGameState(GameState.QUIZ);
     } catch (e) {
-      setQuizQuestions(FALLBACK_QUESTIONS);
+      // Xatolik bo'lsa ham o'zimizdan 5 tasini olamiz
+      console.error("Quiz Error:", e);
+      setQuizQuestions(getRandomFallbackQuestions(5));
       setGameState(GameState.QUIZ);
     } finally {
       setIsQuizLoading(false);
@@ -37,7 +57,6 @@ const App: React.FC = () => {
   };
 
   const handleGameOver = () => {
-    // Only trigger if we are actually playing
     setGameState((prev) =>
       prev === GameState.PLAYING ? GameState.GAME_OVER : prev
     );
@@ -48,12 +67,15 @@ const App: React.FC = () => {
     score: levelScore,
     moves,
     goals,
+    collected,
+    bonusStats,
     selectTile,
     selectedTile,
     initBoard,
   } = useMatch3(
     currentLevelConfig,
     () => {
+      // Maqsadlarga erishilganda Kviz boshlanadi
       if (gameState === GameState.PLAYING) prepareQuiz();
     },
     handleGameOver
@@ -133,116 +155,131 @@ const App: React.FC = () => {
     );
   }
 
+  // --- MAIN GAME SCENE ---
+
   return (
-    <div className="min-h-screen bg-slate-950 text-white relative flex flex-col items-center py-2 overflow-hidden touch-none">
+    <div className="min-h-screen bg-slate-950 text-white relative flex flex-col items-center py-2 overflow-y-auto overflow-x-hidden touch-none">
       <div className="scanlines"></div>
 
-      {/* HUD */}
-      <div className="w-full max-w-lg px-4 mb-2 z-10 flex justify-between items-end">
-        <div>
-          <h3 className="text-neon-cyan font-orbitron text-xs md:text-sm">
-            LEVEL {currentLevelConfig.level}
-          </h3>
-          <div className="text-2xl md:text-3xl font-bold font-mono">
-            {levelScore.toLocaleString()}
-          </div>
-        </div>
-        <div className="flex gap-2">
-          {Object.entries(goals).map(
-            ([key, val]) =>
-              (val as number) > 0 && (
-                <div
-                  key={key}
-                  className="flex flex-col items-center bg-slate-900/80 p-1.5 rounded border border-slate-700 min-w-[40px]"
-                >
-                  <span className="text-[9px] text-slate-400">{key}</span>
-                  <span className="font-bold text-sm text-white">{val}</span>
-                </div>
-              )
-          )}
-        </div>
-        <div className="text-right">
-          <h3 className="text-neon-pink font-orbitron text-xs md:text-sm">
-            MOVES
-          </h3>
-          <div
-            className={`text-2xl md:text-3xl font-bold font-mono ${
-              moves < 5 ? "text-red-500 animate-pulse" : ""
-            }`}
-          >
-            {moves}
-          </div>
-        </div>
-      </div>
-
-      {/* Grid Area */}
-      <div className="relative z-10 p-2 md:p-4 bg-slate-900/50 rounded-xl border border-slate-800 shadow-2xl backdrop-blur-sm aspect-square w-full max-w-[95vw] md:max-w-[600px]">
-        {/* The Grid Container */}
-        <div
-          className="w-full h-full grid gap-1 md:gap-2 relative"
-          style={{
-            gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
-            gridTemplateRows: `repeat(${GRID_SIZE}, 1fr)`,
-          }}
-        >
-          {/* 
-             Muhim o'zgarish: 
-             board.flat() qilib, barcha tilelarni bitta ro'yxatga olamiz.
-             Har bir tile o'zining ID siga ega key bilan render bo'ladi.
-             style da gridRow va gridColumn beramiz. 
-          */}
-          {board.flat().map((tile) => (
-            <div
-              key={tile.id}
-              className="relative w-full h-full transition-all duration-300 ease-in-out"
-              style={{
-                gridColumn: tile.col + 1,
-                gridRow: tile.row + 1,
-                zIndex:
-                  selectedTile?.r === tile.row && selectedTile?.c === tile.col
-                    ? 50
-                    : 1,
-              }}
-            >
-              {tile.type !== "EMPTY" && (
-                <Tile
-                  tile={tile}
-                  isSelected={
-                    selectedTile?.r === tile.row && selectedTile?.c === tile.col
-                  }
-                  onClick={() => selectTile(tile.row, tile.col)}
-                />
+      {/* MAIN LAYOUT CONTAINER */}
+      <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-start justify-center gap-6 w-full max-w-7xl p-2 lg:p-8">
+        
+        {/* LEFT COLUMN: GAMEPLAY AREA */}
+        <div className="flex flex-col items-center w-full max-w-[600px]">
+          
+          {/* HUD */}
+          <div className="w-full px-4 mb-2 flex justify-between items-end">
+            <div>
+              <h3 className="text-neon-cyan font-orbitron text-xs md:text-sm">
+                LEVEL {currentLevelConfig.level}
+              </h3>
+              <div className="text-2xl md:text-3xl font-bold font-mono">
+                {levelScore.toLocaleString()}
+              </div>
+            </div>
+            
+            <div className="flex gap-2">
+              {Object.entries(goals).map(
+                ([key, val]) =>
+                  (val as number) > 0 && (
+                    <div
+                      key={key}
+                      className="flex flex-col items-center bg-slate-900/80 p-1.5 rounded border border-slate-700 min-w-[40px]"
+                    >
+                      <span className="text-[9px] text-slate-400">{key}</span>
+                      <span className="font-bold text-sm text-white">{val}</span>
+                    </div>
+                  )
               )}
             </div>
-          ))}
+
+            <div className="text-right">
+              <h3 className="text-neon-pink font-orbitron text-xs md:text-sm">
+                MOVES
+              </h3>
+              <div
+                className={`text-2xl md:text-3xl font-bold font-mono ${
+                  moves < 5 ? "text-red-500 animate-pulse" : ""
+                }`}
+              >
+                {moves}
+              </div>
+            </div>
+          </div>
+
+          {/* GRID CONTAINER */}
+          <div className="relative p-2 md:p-4 bg-slate-900/50 rounded-xl border border-slate-800 shadow-2xl backdrop-blur-sm aspect-square w-full">
+            <div
+              className="w-full h-full grid gap-1 md:gap-2 relative"
+              style={{
+                gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
+                gridTemplateRows: `repeat(${GRID_SIZE}, 1fr)`,
+              }}
+            >
+              {board.flat().map((tile) => (
+                <div
+                  key={tile.id}
+                  className="relative w-full h-full transition-all duration-300 ease-in-out"
+                  style={{
+                    gridColumn: tile.col + 1,
+                    gridRow: tile.row + 1,
+                    zIndex:
+                      selectedTile?.r === tile.row && selectedTile?.c === tile.col
+                        ? 50
+                        : 1,
+                  }}
+                >
+                  {tile.type !== "EMPTY" && (
+                    <Tile
+                      tile={tile}
+                      isSelected={
+                        selectedTile?.r === tile.row && selectedTile?.c === tile.col
+                      }
+                      onClick={() => selectTile(tile.row, tile.col)}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Game Over Overlay */}
+            {gameState === GameState.GAME_OVER &&
+              currentLevelIdx < LEVELS.length - 1 && (
+                <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center rounded-xl backdrop-blur-sm z-50">
+                  <h2 className="text-3xl text-red-500 font-orbitron mb-4">
+                    SYSTEM FAILURE
+                  </h2>
+                  <p className="mb-4 text-slate-400">Moves Exhausted</p>
+                  <button
+                    onClick={startGame}
+                    className="px-6 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-black transition-colors flex items-center gap-2 rounded"
+                  >
+                    <RefreshCw className="w-4 h-4" /> REBOOT
+                  </button>
+                </div>
+              )}
+
+            {/* Loading Overlay */}
+            {isQuizLoading && (
+              <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center rounded-xl backdrop-blur-sm z-50 animate-in fade-in">
+                <Zap className="w-12 h-12 text-neon-cyan mb-4 animate-bounce" />
+                <h2 className="text-lg font-orbitron text-neon-cyan animate-pulse">
+                  GENERATING ASSESSMENT
+                </h2>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Game Over Overlay */}
-        {gameState === GameState.GAME_OVER &&
-          currentLevelIdx < LEVELS.length - 1 && (
-            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center rounded-xl backdrop-blur-sm z-50">
-              <h2 className="text-3xl text-red-500 font-orbitron mb-4">
-                SYSTEM FAILURE
-              </h2>
-              <p className="mb-4 text-slate-400">Moves Exhausted</p>
-              <button
-                onClick={startGame}
-                className="px-6 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-black transition-colors flex items-center gap-2 rounded"
-              >
-                <RefreshCw className="w-4 h-4" /> REBOOT
-              </button>
-            </div>
-          )}
+        {/* RIGHT COLUMN: MISSION PANEL */}
+        <div className="w-full lg:w-auto mt-4 lg:mt-0 animate-in slide-in-from-right-10 fade-in duration-700">
+          <MissionPanel 
+            goals={currentLevelConfig.goals} 
+            collected={collected}           
+            bonusStats={bonusStats}         
+          />
+        </div>
 
-        {/* Loading Overlay */}
-        {isQuizLoading && (
-          <div className="absolute inset-0 bg-black/90 flex flex-col items-center justify-center rounded-xl backdrop-blur-sm z-50 animate-in fade-in">
-            <Zap className="w-12 h-12 text-neon-cyan mb-4 animate-bounce" />
-            <h2 className="text-lg font-orbitron text-neon-cyan animate-pulse">
-              GENERATING ASSESSMENT
-            </h2>
-          </div>
-        )}
       </div>
 
       {/* Quiz Modal */}
