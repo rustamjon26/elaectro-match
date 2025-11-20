@@ -20,15 +20,15 @@ export const TOKEN_COLORS: Record<string, string> = {
 export const LEVELS: LevelConfig[] = [
   {
     level: 1,
-    moves: 18, // <--- 3 EMAS, 25 TA YURISH (O'ynash uchun yetarli)
+    moves: 34, // <--- 3 EMAS, 25 TA YURISH (O'ynash uchun yetarli)
     activeTokens: [TokenType.BJT, TokenType.FET, TokenType.GAIN],
-    goals: { [TokenType.BJT]: 10, [TokenType.FET]: 10, [TokenType.GAIN]: 10 }, // 10 tadan yig'ish kerak
+    goals: { [TokenType.BJT]: 40, [TokenType.FET]: 40, [TokenType.GAIN]: 40 }, // 10 tadan yig'ish kerak
     mechanics: { noiseChance: 0, lockChance: 0, staticChance: 0 },
     quizDifficulty: "Easy",
   },
   {
     level: 2,
-    moves: 22,
+    moves: 30,
     activeTokens: [
       TokenType.BJT,
       TokenType.FET,
@@ -36,10 +36,10 @@ export const LEVELS: LevelConfig[] = [
       TokenType.HIGH_Z,
     ],
     goals: {
-      [TokenType.BJT]: 8,
-      [TokenType.FET]: 8,
-      [TokenType.GAIN]: 6,
-      [TokenType.HIGH_Z]: 4,
+      [TokenType.BJT]: 30,
+      [TokenType.FET]: 30,
+      [TokenType.GAIN]: 30,
+      [TokenType.HIGH_Z]: 30,
     },
     mechanics: { noiseChance: 0.05, lockChance: 0, staticChance: 0 },
     quizDifficulty: "Medium",
@@ -47,26 +47,6 @@ export const LEVELS: LevelConfig[] = [
   // ... Qolgan levellar o'zgarishsiz qolsa ham bo'ladi
   {
     level: 3,
-    moves: 24,
-    activeTokens: [
-      TokenType.BJT,
-      TokenType.FET,
-      TokenType.GAIN,
-      TokenType.HIGH_Z,
-      TokenType.SWITCH,
-    ],
-    goals: {
-      [TokenType.BJT]: 10,
-      [TokenType.FET]: 10,
-      [TokenType.GAIN]: 8,
-      [TokenType.HIGH_Z]: 6,
-      [TokenType.SWITCH]: 5,
-    },
-    mechanics: { noiseChance: 0.05, lockChance: 0.03, staticChance: 0 },
-    quizDifficulty: "Medium",
-  },
-  {
-    level: 4,
     moves: 26,
     activeTokens: [
       TokenType.BJT,
@@ -75,13 +55,33 @@ export const LEVELS: LevelConfig[] = [
       TokenType.HIGH_Z,
       TokenType.SWITCH,
     ],
-    goals: { [TokenType.BJT]: 12, [TokenType.FET]: 12, [TokenType.GAIN]: 10 },
+    goals: {
+      [TokenType.BJT]: 25,
+      [TokenType.FET]: 25,
+      [TokenType.GAIN]: 25,
+      [TokenType.HIGH_Z]: 25,
+      [TokenType.SWITCH]: 25,
+    },
+    mechanics: { noiseChance: 0.05, lockChance: 0.03, staticChance: 0 },
+    quizDifficulty: "Medium",
+  },
+  {
+    level: 4,
+    moves: 22,
+    activeTokens: [
+      TokenType.BJT,
+      TokenType.FET,
+      TokenType.GAIN,
+      TokenType.HIGH_Z,
+      TokenType.SWITCH,
+    ],
+    goals: { [TokenType.BJT]: 30, [TokenType.FET]: 30, [TokenType.GAIN]: 30 },
     mechanics: { noiseChance: 0.08, lockChance: 0.05, staticChance: 0.02 },
     quizDifficulty: "Hard",
   },
   {
     level: 5,
-    moves: 30,
+    moves: 20,
     activeTokens: [
       TokenType.BJT,
       TokenType.FET,
@@ -90,11 +90,11 @@ export const LEVELS: LevelConfig[] = [
       TokenType.SWITCH,
     ],
     goals: {
-      [TokenType.BJT]: 15,
-      [TokenType.FET]: 15,
-      [TokenType.GAIN]: 15,
-      [TokenType.HIGH_Z]: 10,
-      [TokenType.SWITCH]: 10,
+      [TokenType.BJT]: 40,
+      [TokenType.FET]: 40,
+      [TokenType.GAIN]: 40,
+      [TokenType.HIGH_Z]: 40,
+      [TokenType.SWITCH]: 40,
     },
     mechanics: { noiseChance: 0.1, lockChance: 0.1, staticChance: 0.05 },
     quizDifficulty: "Expert",
@@ -211,16 +211,6 @@ export const FALLBACK_QUESTIONS: QuizQuestion[] = [
     correctIndex: 2,
   },
   {
-    question: "Rasmda qanday diod keltirilgan?",
-    options: [
-      "Yarimo‘tkazgichli diod",
-      "Optron diod",
-      "Fotodiod",
-      "To‘g‘rilovchi diod",
-    ],
-    correctIndex: 0,
-  },
-  {
     question: "O‘tish 3-elektrod orqali boshqariladigan diod qaysi?",
     options: ["Tiristor diod", "Foto diod", "Optron diod", "Tunel diod"],
     correctIndex: 0,
@@ -259,21 +249,6 @@ export const FALLBACK_QUESTIONS: QuizQuestion[] = [
       "Teskari ulanadi",
       "Diffuziya yo‘q, tezkor injeksiya bilan bog‘liq",
       "Yorug‘likni tokka aylantiradi",
-    ],
-    correctIndex: 2,
-  },
-  {
-    question: "Bu rasm qaysi diodga tegishli?",
-    options: ["Varikap diod", "Shottki diod", "Tunel diod", "Stabilitron diod"],
-    correctIndex: 1,
-  },
-  {
-    question: "Bu qanday sxema? (Darlington/Uilson faylidan)",
-    options: [
-      "Ulison tok ko‘zgusi",
-      "Aktiv tok transformatori",
-      "Darlingtong juftligi",
-      "Tarkibiy transistor",
     ],
     correctIndex: 2,
   },
@@ -421,11 +396,6 @@ export const FALLBACK_QUESTIONS: QuizQuestion[] = [
       "To‘yinish kuchlanishi",
       "Ishchi rejim",
     ],
-    correctIndex: 0,
-  },
-  {
-    question: "Umumiy istok ulanish sxemasi qaysi?",
-    options: ["A", "B", "C", "D"],
     correctIndex: 0,
   },
   {
@@ -631,53 +601,6 @@ export const FALLBACK_QUESTIONS: QuizQuestion[] = [
   },
   {
     question:
-      "Quyidagi formula qaysi parametrga tegishli? (Differensial qarshilik)",
-    options: [
-      "Ichki differensial qarshilik",
-      "Kuchlanish bo‘yicha kuchaytirish koeffitsiyenti",
-      "Diferensial tiklik",
-      "Xarakteristika tikligi",
-    ],
-    correctIndex: 0,
-  },
-  {
-    question:
-      "Quyidagi formula qaysi parametrga tegishli? (Tiklik xarakteristikasi)",
-    options: [
-      "Tiklik xarakteristikasi",
-      "Kuchlanish kuchaytirish koeffitsiyenti",
-      "Ichki differensial qarshilik",
-      "Kuchlanishning xususiy qarshiligi",
-    ],
-    correctIndex: 0,
-  },
-  {
-    question: "Quyidagi formula qaysi birining formulasi?",
-    options: [
-      "Tiklik xarakteristikasi",
-      "Ichki differensial qarshilik",
-      "Kuchlanish bo‘yicha kuchaytirish koeffitsiyenti",
-      "Tok kuchining xususiy qarshiligi",
-    ],
-    correctIndex: 2,
-  },
-  {
-    question: "Bu rasm maydoniy tranzistorning qaysi ulanish sxemasi?",
-    options: ["Umumiy istok", "Umumiy stok", "Umumiy zatvor", "Umumiy baza"],
-    correctIndex: 0,
-  },
-  {
-    question: "Bu qanday ulanish?",
-    options: ["Umumiy zatvor", "Umumiy istok", "Umumiy stok", "Umumiy baza"],
-    correctIndex: 2,
-  },
-  {
-    question: "Bu qanday ulanish hisoblanadi?",
-    options: ["Umumiy istok", "Umumiy zatvor", "Umumiy stok", "Umumiy emitter"],
-    correctIndex: 1,
-  },
-  {
-    question:
       "Tranzistorda istok va stok orasidagi kanal tayyorlash jarayonida hosil bo‘lsa, bu qanday tranzistor?",
     options: [
       "Izolyatsiyalangan",
@@ -792,42 +715,6 @@ export const FALLBACK_QUESTIONS: QuizQuestion[] = [
     correctIndex: 0,
   },
   {
-    question: "Bu qanday grafik?",
-    options: [
-      "Diodning to‘g‘ri ulanish grafigi",
-      "Diodning FCHX",
-      "Diodning VAX",
-      "Diodning ACHX",
-    ],
-    correctIndex: 2,
-  },
-  {
-    question: "Bu diodda qaysi ulanish keltirilgan?",
-    options: [
-      "Yarimo‘tkazgichli ulanish",
-      "To‘g‘ri ulanish",
-      "Parallel ulanish",
-      "Teskari ulanish",
-    ],
-    correctIndex: 1,
-  },
-  {
-    question: "Bu qanday sxema hisoblanadi? (Darlington/Uilson mavzusi)",
-    options: [
-      "Ulison tok ko‘zgusi",
-      "Aktiv tok transformatori",
-      "Darlington juftligi",
-      "Tarkibiy transistor",
-    ],
-    correctIndex: 0,
-  },
-  {
-    question:
-      "Natijaviy kirish qarshiligi taxminan qanday bo‘ladi? (Uilson/Darlington)",
-    options: ["A", "B", "C", "D"],
-    correctIndex: 2,
-  },
-  {
     question:
       "Ikkita tranzistor ketma-ket ulanganida natijaviy tok kuchaytirish koeffitsienti qanday topiladi?",
     options: ["I1 × I2", "I1 + I2", "β1 + β2", "β1 × β2"],
@@ -887,21 +774,6 @@ export const FALLBACK_QUESTIONS: QuizQuestion[] = [
     correctIndex: 0,
   },
   {
-    question: "Bu qanday sxema? (Darlington/Uilson/Yuklama)",
-    options: [
-      "Darlington juftligi",
-      "Uilson tok ko‘zgusi",
-      "Aktiv tok transformatori",
-      "Analog kuchaytirgich",
-    ],
-    correctIndex: 1,
-  },
-  {
-    question: "Qurilmaning kirish toki uchun qaysi munosabat o‘rinli?",
-    options: ["A", "B", "C", "D"],
-    correctIndex: 0,
-  },
-  {
     question:
       "Tok ko‘zgusini barqarorlashtirish uchun rezistor nima hosil qiladi?",
     options: [
@@ -912,66 +784,297 @@ export const FALLBACK_QUESTIONS: QuizQuestion[] = [
     ],
     correctIndex: 0,
   },
+
   {
-    question: "Quyidagi formula nimaga tegishli? (Kirish qarshiligi / Uzatish)",
+    question:
+      "BJTning aktiv rejimida kollektor toki qaysi parametr orqali deyarli to‘liq boshqariladi?",
     options: [
-      "Kirish qarshiligi",
-      "Chiqish uzatuvchanligi",
-      "Tok bo‘yicha uzatish koeffitsiyenti",
-      "Teskari bog‘lanish koeffitsiyenti",
+      "Baza toki",
+      "Kollektor kuchlanishi",
+      "Emitter kuchlanishi",
+      "β ning harorati",
     ],
     correctIndex: 0,
   },
   {
-    question: "Bu formula qaysi parametrni bildiradi?",
-    options: [
-      "Kirish qarshiligi",
-      "Chiqish uzatuvchanligi",
-      "Tok bo‘yicha uzatish koeffitsiyenti",
-      "Teskari bog‘lanish",
-    ],
-    correctIndex: 1,
-  },
-  {
     question:
-      "Bu formulada nimaning ifodasi berilgan? (β uzatish koeffitsient)",
+      "Kollektor-Jem birikmasi teskari ulangan holatda BJT qanday xususiyat beradi?",
     options: [
-      "Kirish qarshiligi",
-      "Chiqish uzatuvchanligi",
-      "Tok bo‘yicha uzatish koeffitsiyenti",
-      "Teskari bog‘lanish",
-    ],
-    correctIndex: 2,
-  },
-  {
-    question: "Bu formulada nima ifodalangan?",
-    options: [
-      "Kirish qarshiligi",
-      "Chiqish o‘tkazuvchanligi",
-      "Tok bo‘yicha uzatish koeffitsiyenti",
-      "Teskari bog‘lanish koeffitsiyenti",
-    ],
-    correctIndex: 1,
-  },
-  {
-    question:
-      "Bu qanday sxema? (Shiklai / Darlington / Uilson / Transformator)",
-    options: [
-      "Shiklai juftligi",
-      "Darlington juftligi",
-      "Uilson juftligi",
-      "Aktiv transformator",
+      "Katta kirish qarshiligi",
+      "To‘g‘ri yo‘nalgan katta tok",
+      "Kichik chiqish qarshiligi",
+      "Termik shovqinning kamayishi",
     ],
     correctIndex: 0,
   },
   {
-    question: "Bu qanday sxema?",
+    question: "β (hFE) ning katta bo‘lishi qaysi holatda foydali bo‘ladi?",
     options: [
-      "Shiklai juftligi",
-      "Darlington juftligi",
-      "Uilson juftligi",
-      "Aktiv transformator",
+      "Kuchaytirgichning kirish toki minimal bo‘lishi kerak bo‘lganda",
+      "Tranzistorni to‘yingan rejimga o‘tkazishda",
+      "Yuklamani kamaytirishda",
+      "Kollektor toki nolga yaqin bo‘lganda",
     ],
-    correctIndex: 3,
+    correctIndex: 0,
+  },
+  {
+    question:
+      "BJTning termik qochishi (thermal runaway) nima sababdan yuzaga keladi?",
+    options: [
+      "Kollektor toki oshishi bilan issiqlik ortadi va yana tok oshadi",
+      "Baza toki nolga teng bo‘lganda",
+      "Kichik kuchlanishda ishlaganda",
+      "Emitter qarshiligi juda kattaligidan",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question:
+      "Emitterga qo‘yilgan rezistor BJT stabilizatsiyasida qanday rol o‘ynaydi?",
+    options: [
+      "Salbiy teskari aloqa hosil qiladi",
+      "Musbat aloqa hosil qiladi",
+      "Kuchlanishni ikki barobar oshiradi",
+      "Baza tokini to‘liq uzib qo‘yadi",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question:
+      "MOSFETda kanal hosil bo‘lishi uchun qanday shart bajarilishi kerak?",
+    options: [
+      "VGS > Vth bo‘lishi",
+      "VDS = 0 bo‘lishi",
+      "ID = 0 bo‘lishi",
+      "GS qatlamlari teskari ulanadi",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question:
+      "MOSFETning kirish qarshiligi juda katta bo‘lishiga asosiy sabab nima?",
+    options: [
+      "Gate oksid qatlami izolyator",
+      "Drenajning dopingi kuchli",
+      "Kanal past harakatlanish tezlikka ega",
+      "Substrat qarshiligi nolga teng",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "JFET yopilish kuchlanishi (VGS(off)) nimani bildiradi?",
+    options: [
+      "Kanal to‘liq yopiladigan gate kuchlanishi",
+      "Drenaj toki maksimal bo‘ladigan kuchlanish",
+      "Gate zaryadi ikki barobar bo‘lishi",
+      "Substrat toki yo‘qolishi",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question:
+      "MOSFETni to‘yingan rejimga o‘tkazish uchun odatda qanday shart bajariladi?",
+    options: ["VDS > VGS - Vth", "VDS < VGS", "ID = 0", "VDS = 0"],
+    correctIndex: 0,
+  },
+  {
+    question: "FETlarda shovqin kam bo‘lishiga sabab nima?",
+    options: [
+      "Gate orqali tok oqmaydi",
+      "Kanal dopingi katta",
+      "Substrat harorati past",
+      "Drain qarshiligi o‘zgaruvchan",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question:
+      "Kuchaytirgichning ochiq kontur kuchaytirish koeffitsienti (AOL) deganda nima tushuniladi?",
+    options: [
+      "Teskari aloqa ulanmagan holatdagi kuchaytirish",
+      "Yuklama ulangan holatdagi kuchlanish oshishi",
+      "Signal shaklini moslashtirish darajasi",
+      "Signalning kirishdagi shovqin darajasi",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "Teskari aloqa kuchaytirgichda qaysi xususiyatni yaxshilaydi?",
+    options: [
+      "Barqarorlik",
+      "Shovqinni oshiradi",
+      "Gainni cheksiz oshiradi",
+      "Fazoviy kechikishni yo‘q qiladi",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "Differensial kuchaytirgichning eng katta afzalligi nimada?",
+    options: [
+      "Umumiy rejimdagi shovqinni rad etish",
+      "Kirish qarshiligini kamaytirish",
+      "Kollektor quvvatini oshirish",
+      "Yuklamani teskari ulash",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "Gain banda (A·f) nima bildiradi?",
+    options: [
+      "Kuchaytirgichning gain va chastota chegarasining ko‘paytmasi",
+      "Signalning faza o‘zgarishi",
+      "Tokning garmonik tarkibi",
+      "Kirish bo‘g‘inining qarshiligi",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "Operational amplifierda slew rate nimani belgilaydi?",
+    options: [
+      "Chiqish signalining maksimal o‘zgarish tezligi",
+      "Kirish ferrit induktivligi",
+      "Feedback qarshiligini",
+      "Kollektor toki qiymatini",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "High-Z holat qaysi qurilmada eng ko‘p uchraydi?",
+    options: [
+      "Tristate bufferda",
+      "Kuch transformatorida",
+      "Induktiv yuklamada",
+      "NPN to‘yingan rejimida",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "High-Z holatning asosiy vazifasi?",
+    options: [
+      "Shinadan butunlay uzilish yaratish",
+      "Signalni kuchaytirish",
+      "Tokni oshirish",
+      "Fazani sinxronlash",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "Digital busda moslashuvchan ulanish uchun High-Z nima beradi?",
+    options: [
+      "Uchta qurilma bir xil shinaga bog‘lanishi mumkin",
+      "Signal chastotasini oshiradi",
+      "Raqamli shovqinni kamaytiradi",
+      "Kuchlanishni ikki barobar oshiradi",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "Tristate chiqishning uchinchi holati nimani anglatadi?",
+    options: [
+      "Chiqish elektr jihatdan uzilgan",
+      "Chiqish past darajada",
+      "Chiqish yuqori darajada",
+      "Signal inversiya qilingan",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "CMOS kirish qismi High-Z bo‘lishiga nima sabab?",
+    options: [
+      "Gate oksidi tok o‘tkazmaydi",
+      "Drain yuqori impedansga ega",
+      "Substrat nurlanadi",
+      "Gate kirish doimo to‘yingan",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question:
+      "Tranzistorning switch rejimida ishlashi uchun qanday shart bajariladi?",
+    options: [
+      "To‘yingan va yopiq rejimlar orasida almashadi",
+      "Faqat aktiv rejimda turadi",
+      "Kollektor toki doimiy bo‘ladi",
+      "Baza toki nolga teng bo‘ladi",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "To‘yingan rejimdagi BJTning asosiy belgisi?",
+    options: [
+      "Kollektor–baza birikmasi to‘g‘ri ulanadi",
+      "Gate kuchlanishi oshadi",
+      "Emitter toki nolga teng",
+      "Kanal yopiladi",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "MOSFET switch sifatida ishlaganda eng muhim parametr?",
+    options: ["Rds(on)", "Vgs(off)", "β qiymati", "Leakage current"],
+    correctIndex: 0,
+  },
+  {
+    question: "Tranzistorning cutoff rejimi nimani anglatadi?",
+    options: [
+      "Barcha tok deyarli nol",
+      "Kuchlanish maksimal",
+      "Kollektor oqimi ikki barobar",
+      "Gate kuchlanishi oshgan",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question:
+      "PWM boshqaruvida tranzistor switch sifatida ishlashi uchun nima talab qilinadi?",
+    options: [
+      "Juda tez ochilib-yopilishi",
+      "Har doim aktiv rejimda bo‘lishi",
+      "Kirish qarshiligini oshirish",
+      "Termik barqarorlikni kamaytirish",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "MOSFETni yuqori quvvatda ishlatishda qaysi xavf eng kattadir?",
+    options: [
+      "SOA (safe operating area) dan chiqib ketish",
+      "Gate kuchlanishining nolga teng bo‘lishi",
+      "Drain kuchlanishining pastligi",
+      "Tristate signal berilishi",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question: "Switching loss qaysi holatda eng katta bo‘ladi?",
+    options: [
+      "Tranzistor oraliq rejimda vaqt o‘tkazganda",
+      "Cutoff rejimida",
+      "To‘yingan rejimda",
+      "High-Z holatda",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question:
+      "Induktiv yuklama bilan tranzistorni o‘chirishda nima talab qilinadi?",
+    options: [
+      "Flyback diod",
+      "Gate qarshiligi nolga teng bo‘lishi",
+      "Kollektor kuchlanishi past bo‘lishi",
+      "Shina qarshiligini oshirish",
+    ],
+    correctIndex: 0,
+  },
+  {
+    question:
+      "Logik daraja mos kelmasligida MOSFET chiqishi ishlamaslik sababi?",
+    options: [
+      "VGS yetarli darajada ochilmaydi",
+      "Drain kuchlanishi noldir",
+      "ID maksimalga chiqadi",
+      "Gate kichik quvvat iste'mol qiladi",
+    ],
+    correctIndex: 0,
   },
 ];
