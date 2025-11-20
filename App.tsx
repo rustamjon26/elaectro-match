@@ -28,7 +28,7 @@ const App: React.FC = () => {
   const prepareQuiz = async () => {
     if (isQuizLoading) return;
     setIsQuizLoading(true);
-    
+
     try {
       // 1. Avval API dan olishga urinib ko'ramiz
       const questions = await generateQuizQuestions(
@@ -44,7 +44,7 @@ const App: React.FC = () => {
         console.warn("API failed, using fallback questions");
         setQuizQuestions(getRandomFallbackQuestions(5));
       }
-      
+
       setGameState(GameState.QUIZ);
     } catch (e) {
       // Xatolik bo'lsa ham o'zimizdan 5 tasini olamiz
@@ -163,10 +163,8 @@ const App: React.FC = () => {
 
       {/* MAIN LAYOUT CONTAINER */}
       <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-start justify-center gap-6 w-full max-w-7xl p-2 lg:p-8">
-        
         {/* LEFT COLUMN: GAMEPLAY AREA */}
         <div className="flex flex-col items-center w-full max-w-[600px]">
-          
           {/* HUD */}
           <div className="w-full px-4 mb-2 flex justify-between items-end">
             <div>
@@ -177,7 +175,7 @@ const App: React.FC = () => {
                 {levelScore.toLocaleString()}
               </div>
             </div>
-            
+
             <div className="flex gap-2">
               {Object.entries(goals).map(
                 ([key, val]) =>
@@ -187,7 +185,9 @@ const App: React.FC = () => {
                       className="flex flex-col items-center bg-slate-900/80 p-1.5 rounded border border-slate-700 min-w-[40px]"
                     >
                       <span className="text-[9px] text-slate-400">{key}</span>
-                      <span className="font-bold text-sm text-white">{val}</span>
+                      <span className="font-bold text-sm text-white">
+                        {val}
+                      </span>
                     </div>
                   )
               )}
@@ -205,6 +205,12 @@ const App: React.FC = () => {
                 {moves}
               </div>
             </div>
+            <button
+              onClick={prepareQuiz}
+              className="bg-red-500 px-2 py-1 text-xs font-bold rounded z-50 hover:bg-red-400"
+            >
+              FORCE QUIZ
+            </button>
           </div>
 
           {/* GRID CONTAINER */}
@@ -224,7 +230,8 @@ const App: React.FC = () => {
                     gridColumn: tile.col + 1,
                     gridRow: tile.row + 1,
                     zIndex:
-                      selectedTile?.r === tile.row && selectedTile?.c === tile.col
+                      selectedTile?.r === tile.row &&
+                      selectedTile?.c === tile.col
                         ? 50
                         : 1,
                   }}
@@ -233,7 +240,8 @@ const App: React.FC = () => {
                     <Tile
                       tile={tile}
                       isSelected={
-                        selectedTile?.r === tile.row && selectedTile?.c === tile.col
+                        selectedTile?.r === tile.row &&
+                        selectedTile?.c === tile.col
                       }
                       onClick={() => selectTile(tile.row, tile.col)}
                     />
@@ -273,13 +281,12 @@ const App: React.FC = () => {
 
         {/* RIGHT COLUMN: MISSION PANEL */}
         <div className="w-full lg:w-auto mt-4 lg:mt-0 animate-in slide-in-from-right-10 fade-in duration-700">
-          <MissionPanel 
-            goals={currentLevelConfig.goals} 
-            collected={collected}           
-            bonusStats={bonusStats}         
+          <MissionPanel
+            goals={currentLevelConfig.goals}
+            collected={collected}
+            bonusStats={bonusStats}
           />
         </div>
-
       </div>
 
       {/* Quiz Modal */}

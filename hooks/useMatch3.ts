@@ -121,7 +121,6 @@ export const useMatch3 = (levelConfig: LevelConfig, onGoalMet: () => void, onGam
   };
 
   const updateGoals = (matchedTiles: Tile[]) => {
-    let goalsMet = false;
     setGoals(prev => {
       const next = { ...prev };
       matchedTiles.forEach(t => {
@@ -129,14 +128,19 @@ export const useMatch3 = (levelConfig: LevelConfig, onGoalMet: () => void, onGam
           next[t.type]--;
         }
       });
+
+      // Qolgan maqsadlarni hisoblash
       const remaining = Object.values(next).reduce((a, b) => a + b, 0);
-      if (remaining <= 0) goalsMet = true;
+      
+      console.log("Qolgan maqsadlar:", remaining); // <-- KONSOLGA CHIQARISH
+
+      // Agar 0 bo'lsa, maqsadga erishildi
+      if (remaining <= 0) {
+          console.log("MAQSAD BAJARILDI! Kviz chaqirilmoqda...");
+          setTimeout(onGoalMet, 500);
+      }
       return next;
     });
-
-    if (goalsMet) {
-        setTimeout(onGoalMet, 500);
-    }
   };
 
   const handleGravity = async (boardState: Tile[][]) => {
