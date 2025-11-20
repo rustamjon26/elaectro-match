@@ -1,6 +1,9 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { QuizQuestion } from '../types';
 import { Clock, BrainCircuit, CheckCircle, XCircle } from 'lucide-react';
+import { useSound } from '../hooks/useSound'; // <--- IMPORT
 
 interface QuizModalProps {
   questions: QuizQuestion[];
@@ -15,23 +18,18 @@ export const QuizModal: React.FC<QuizModalProps> = ({ questions, onComplete }) =
   const [timeLeft, setTimeLeft] = useState(15);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Agar savollar kelmasa, modalni ko'rsatma (Crash oldini olish)
+  const { play } = useSound(); // <--- HOOK
+
   if (!questions || questions.length === 0) {
     console.error("QuizModal: Savollar yo'q!");
     return null; 
   }
 
   const currentQ = questions[currentIndex];
+  if (!currentQ) return null;
 
-  // Agar index adashib ketsa, crash bermaslik uchun
-  if (!currentQ) {
-    return null;
-  }
-
-  // Timer logikasi
   useEffect(() => {
     if (isPaused || showResult) return;
-
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -42,13 +40,13 @@ export const QuizModal: React.FC<QuizModalProps> = ({ questions, onComplete }) =
         return prev - 1;
       });
     }, 1000);
-
     return () => clearInterval(timer);
   }, [currentIndex, showResult, isPaused]);
 
   const handleTimeOut = () => {
-    if (showResult) return; // Agar allaqachon javob berilgan bo'lsa
-    setSelectedOption(-1); // -1 vaqt tugaganini bildiradi
+    if (showResult) return; 
+    play('wrong'); // <--- VAQT TUGASA XATO OVOZI
+    setSelectedOption(-1);
     setShowResult(true);
     setIsPaused(true);
   };
@@ -62,31 +60,32 @@ export const QuizModal: React.FC<QuizModalProps> = ({ questions, onComplete }) =
     
     if (index === currentQ.correctIndex) {
       setScore((s) => s + 100);
+      play('correct'); // <--- TO'G'RI JAVOB OVOZI
+    } else {
+      play('wrong'); // <--- XATO JAVOB OVOZI
     }
   };
 
   const nextQuestion = () => {
+    play('click');
     if (currentIndex < questions.length - 1) {
-      // Keyingi savolga o'tish
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
       setShowResult(false);
       setTimeLeft(15);
       setIsPaused(false);
     } else {
-      // Kviz tugadi
       onComplete(score);
     }
   };
 
+  // ... (qolgan render qismi avvalgidek, faqat tugmaga play('click') qo'shildi)
+  
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-lg p-4 animate-in fade-in duration-300">
       <div className="w-full max-w-2xl bg-[#0f172a] border-2 border-[#00E5FF] rounded-2xl shadow-[0_0_50px_rgba(0,229,255,0.3)] overflow-hidden relative">
-        
-        {/* Scanline effect overlay */}
         <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] opacity-20"></div>
 
-        {/* Header */}
         <div className="bg-[#1e293b] p-4 flex justify-between items-center border-b border-slate-700 relative z-10">
           <div className="flex items-center gap-2 text-[#00E5FF]">
             <BrainCircuit className="w-6 h-6 animate-pulse" />
@@ -98,7 +97,6 @@ export const QuizModal: React.FC<QuizModalProps> = ({ questions, onComplete }) =
           </div>
         </div>
 
-        {/* Content */}
         <div className="p-6 md:p-8 relative z-10">
           <div className="flex justify-between items-center mb-4">
             <span className="text-slate-400 text-xs font-mono tracking-widest">

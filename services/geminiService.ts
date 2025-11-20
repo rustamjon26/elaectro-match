@@ -2,36 +2,26 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { QuizQuestion, TokenType } from "../types";
 import { FALLBACK_QUESTIONS } from "../constants";
 
-// ===============================
-//  Load API key from Vite env
-// ===============================
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-// ===============================
-//  Setup model instance
-// ===============================
 let genAI: GoogleGenerativeAI | null = null;
 
 if (apiKey) {
   genAI = new GoogleGenerativeAI(apiKey);
 } else {
-  console.warn("⚠ VITE_GEMINI_API_KEY topilmadi → Fallback savollar ishlatiladi.");
+  console.warn(
+    "⚠ VITE_GEMINI_API_KEY topilmadi → Fallback savollar ishlatiladi."
+  );
 }
 
-// =====================================================
-// Generate 5 quiz questions using Gemini (or fallback)
-// =====================================================
 export async function generateQuizQuestions(
   difficulty: string,
   topics: TokenType[]
 ): Promise<QuizQuestion[]> {
-
-  // Agar API yo‘q bo‘lsa → fallback
   if (!genAI) {
     return FALLBACK_QUESTIONS;
   }
 
-  // "noise" va "lock" kabi tokenlarni chiqarib tashlaymiz
   const educationalTopics = topics
     .filter(
       (t) =>
@@ -41,9 +31,9 @@ export async function generateQuizQuestions(
     )
     .join(", ");
 
-  // AI uchun prompt
+  // PROMPT O'ZGARDI: 5 -> 10
   const prompt = `
-    Generate 5 multiple-choice quiz questions about electronics engineering.
+    Generate 10 multiple-choice quiz questions about electronics engineering.
     Difficulty: ${difficulty}
 
     Topics: ${educationalTopics}.
@@ -55,25 +45,24 @@ export async function generateQuizQuestions(
   `;
 
   try {
-    // Gemini Flash model
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
     });
 
     const result = await model.generateContent(prompt);
-
     const output = result.response.text();
-    console.log("➡ Gemini output:", output);
 
-    // Try parsing JSON
-    const parsed = JSON.parse(output);
+    // JSON parse qilishga urinish
+    // Ba'zan AI ```json ... ``` formatida qaytaradi, shuni tozalash kerak
+    const cleanedOutput = output.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(cleanedOutput);
 
     if (Array.isArray(parsed)) {
-      return parsed.slice(0, 5);
+      return parsed.slice(0, 10); // 10 ta olish
     }
 
     if (parsed.questions && Array.isArray(parsed.questions)) {
-      return parsed.questions.slice(0, 5);
+      return parsed.questions.slice(0, 10); // 10 ta olish
     }
 
     return FALLBACK_QUESTIONS;

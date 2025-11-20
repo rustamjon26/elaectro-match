@@ -7,6 +7,7 @@ import { QuizModal } from "./components/QuizModal";
 import { MissionPanel } from "./components/MissionPanel";
 import { generateQuizQuestions } from "./services/geminiService";
 import { Play, RefreshCw, Zap, Cpu, Trophy } from "lucide-react";
+import { useSound } from "./hooks/useSound";
 
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.START);
@@ -15,13 +16,18 @@ const App: React.FC = () => {
   const [totalScore, setTotalScore] = useState(0);
   const [isQuizLoading, setIsQuizLoading] = useState(false);
 
+  const { play } = useSound();
   const currentLevelConfig = LEVELS[currentLevelIdx];
 
-  // --- YANGI FUNKSIYA: Tasodifiy savol tanlash ---
-  const getRandomFallbackQuestions = (count: number): QuizQuestion[] => {
-    // Ro'yxatni aralashtiramiz (Shuffle)
-    const shuffled = [...FALLBACK_QUESTIONS].sort(() => 0.5 - Math.random());
-    // Kerakli miqdorni kesib olamiz
+  // --- YORDAMCHI FUNKSIYA: Ro'yxatdan tasodifiy N ta savol olish ---
+  const getRandomQuestions = (
+    allQuestions: QuizQuestion[],
+    count: number
+  ): QuizQuestion[] => {
+    if (!allQuestions || allQuestions.length === 0) return [];
+    // Ro'yxatni aralashtiramiz
+    const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+    // Faqat kerakli miqdorni kesib olamiz
     return shuffled.slice(0, count);
   };
 
@@ -30,26 +36,35 @@ const App: React.FC = () => {
     setIsQuizLoading(true);
 
     try {
-      // 1. Avval API dan olishga urinib ko'ramiz
-      const questions = await generateQuizQuestions(
+      // 1. API dan savol so'raymiz
+      let questions = await generateQuizQuestions(
         currentLevelConfig.quizDifficulty,
         currentLevelConfig.activeTokens
       );
 
-      // 2. Agar API dan savol kelsa, o'shani qo'yamiz
-      if (questions && questions.length >= 5) {
-        setQuizQuestions(questions);
-      } else {
-        // 3. Agar API ishlamasa, o'zimizdagi ro'yxatdan 5 tasini olamiz
-        console.warn("API failed, using fallback questions");
-        setQuizQuestions(getRandomFallbackQuestions(5));
+      // 2. Agar API bo'sh qaytarsa yoki ishlamasa, Fallback ni olamiz
+      if (!questions || questions.length === 0) {
+        console.warn("API savol bermadi, zaxira savollar ishlatiladi.");
+        questions = FALLBACK_QUESTIONS;
       }
 
+      // 3. Agar Fallback ham bo'sh bo'lsa (favqulodda holat)
+      if (!questions || questions.length === 0) {
+        console.error("Zaxira savollar ham topilmadi!");
+        setGameState(GameState.PLAYING); // O'yinni davom ettirishga majburmiz
+        return;
+      }
+
+      // 4. 10 tasini (yoki borini) olamiz
+      const finalQuestions = getRandomQuestions(questions, 10);
+
+      setQuizQuestions(finalQuestions);
       setGameState(GameState.QUIZ);
     } catch (e) {
-      // Xatolik bo'lsa ham o'zimizdan 5 tasini olamiz
       console.error("Quiz Error:", e);
-      setQuizQuestions(getRandomFallbackQuestions(5));
+      // Xatolik bo'lsa, Fallback dan tasodifiy 10 tasini olamiz
+      const fallbackQs = getRandomQuestions(FALLBACK_QUESTIONS, 10);
+      setQuizQuestions(fallbackQs);
       setGameState(GameState.QUIZ);
     } finally {
       setIsQuizLoading(false);
@@ -75,29 +90,41 @@ const App: React.FC = () => {
   } = useMatch3(
     currentLevelConfig,
     () => {
-      // Maqsadlarga erishilganda Kviz boshlanadi
       if (gameState === GameState.PLAYING) prepareQuiz();
     },
     handleGameOver
   );
 
   const startGame = () => {
+    play("click");
     setGameState(GameState.PLAYING);
     initBoard();
   };
 
   const handleQuizComplete = (quizScore: number) => {
+    play("win");
     setTotalScore((s) => s + levelScore + quizScore);
     setGameState(GameState.LEVEL_COMPLETE);
   };
 
   const nextLevel = () => {
+    play("click");
     if (currentLevelIdx < LEVELS.length - 1) {
       setCurrentLevelIdx((p) => p + 1);
       setGameState(GameState.PLAYING);
     } else {
       setGameState(GameState.GAME_OVER);
     }
+  };
+
+  const handleRestart = () => {
+    play("click");
+    startGame();
+  };
+
+  const handleReboot = () => {
+    play("click");
+    window.location.reload();
   };
 
   // --- Scenes ---
@@ -205,12 +232,6 @@ const App: React.FC = () => {
                 {moves}
               </div>
             </div>
-            <button
-              onClick={prepareQuiz}
-              className="bg-red-500 px-2 py-1 text-xs font-bold rounded z-50 hover:bg-red-400"
-            >
-              FORCE QUIZ
-            </button>
           </div>
 
           {/* GRID CONTAINER */}
@@ -259,7 +280,7 @@ const App: React.FC = () => {
                   </h2>
                   <p className="mb-4 text-slate-400">Moves Exhausted</p>
                   <button
-                    onClick={startGame}
+                    onClick={handleRestart}
                     className="px-6 py-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-black transition-colors flex items-center gap-2 rounded"
                   >
                     <RefreshCw className="w-4 h-4" /> REBOOT
@@ -306,7 +327,7 @@ const App: React.FC = () => {
               All systems operational. Final Score: {totalScore}
             </p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={handleReboot}
               className="px-8 py-4 bg-slate-800 border border-slate-600 hover:border-white transition-colors text-white rounded"
             >
               REBOOT SYSTEM

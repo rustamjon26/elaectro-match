@@ -17,19 +17,18 @@ export const TOKEN_COLORS: Record<string, string> = {
   [TokenType.STATIC_FIELD]: "text-blue-800",
 };
 
-// Yurishlar soni kamaytirilgan versiya
 export const LEVELS: LevelConfig[] = [
   {
     level: 1,
-    moves: 3,
+    moves: 18, // <--- 3 EMAS, 25 TA YURISH (O'ynash uchun yetarli)
     activeTokens: [TokenType.BJT, TokenType.FET, TokenType.GAIN],
-    goals: { [TokenType.BJT]: 5, [TokenType.FET]: 5, [TokenType.GAIN]: 5 },
+    goals: { [TokenType.BJT]: 10, [TokenType.FET]: 10, [TokenType.GAIN]: 10 }, // 10 tadan yig'ish kerak
     mechanics: { noiseChance: 0, lockChance: 0, staticChance: 0 },
     quizDifficulty: "Easy",
   },
   {
     level: 2,
-    moves: 18,
+    moves: 22,
     activeTokens: [
       TokenType.BJT,
       TokenType.FET,
@@ -45,9 +44,10 @@ export const LEVELS: LevelConfig[] = [
     mechanics: { noiseChance: 0.05, lockChance: 0, staticChance: 0 },
     quizDifficulty: "Medium",
   },
+  // ... Qolgan levellar o'zgarishsiz qolsa ham bo'ladi
   {
     level: 3,
-    moves: 20,
+    moves: 24,
     activeTokens: [
       TokenType.BJT,
       TokenType.FET,
@@ -67,7 +67,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     level: 4,
-    moves: 22,
+    moves: 26,
     activeTokens: [
       TokenType.BJT,
       TokenType.FET,
@@ -81,7 +81,7 @@ export const LEVELS: LevelConfig[] = [
   },
   {
     level: 5,
-    moves: 25,
+    moves: 30,
     activeTokens: [
       TokenType.BJT,
       TokenType.FET,
