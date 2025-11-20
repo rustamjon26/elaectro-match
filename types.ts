@@ -47,3 +47,18 @@ export interface QuizQuestion {
   correctIndex: number; // 0-3
   explanation?: string;
 }
+export interface BonusStats {
+  noiseDestroyed: number;
+  locksUnlocked: number;
+  maxCombo: number;
+}
+
+// LevelConfig ichiga bonus maqsadlarini qo'shamiz (agar kerak bo'lsa)
+export interface LevelConfig {
+  // ... (eski kodlar)
+  bonusGoals: {
+    noiseTarget: number;
+    lockTarget: number;
+    comboTarget: number;
+  };
+}
